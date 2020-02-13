@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>students api</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ </head>
+<body>
+<div>
+   <button class="apireq">click me </button> 
+</div>
+<!-- {% for i in data.length|make_list%} -->
+
+<div id="jsonresp" style="margin-top: 100px">
+   <p><label> Product ID :</label><span id="id"></span></p>
+   <p><label> name :</label> <span id="name"></span></p>
+   <p><label> Price :</label> <span id="price"></span></p>
+   <p><label> DESc : </label> <span id="desc"></span></p> 
+</div>
+
+<script type="text/javascript"></script>
+</body>
+  <script type="text/javascript">
+  	$('.apireq').click( function() {
+      $.ajax({
+               url : "http://localhost:8000/products/",
+               dataType: "json",
+               success : function (data) {
+
+               debugger;
+
+                for (var i=0;i<data.length;i++){
+                        $('#id').text( data[i].id);
+                        $('#name').text( data[i].name);
+                        $('#price').text( data[i].price);
+                        $('#desc').text( data[i].description);
+
+                      }
+                     } 
+                   });
+               });
+  </script>
+</html>
