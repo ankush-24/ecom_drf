@@ -1,42 +1,34 @@
 <!DOCTYPE html>
-<html>
- <head>
-   <title>students api</title>
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
- </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JSON Test</title>
+</head>
 <body>
-<div>
-   <button class="apireq">click me </button> 
-</div>
-<!-- {% for i in data.length|make_list%} -->
-
-<div id="jsonresp" style="margin-top: 100px">
-   <p><label> Product ID :</label><span id="id"></span></p>
-   <p><label> name :</label> <span id="name"></span></p>
-   <p><label> Price :</label> <span id="price"></span></p>
-   <p><label> DESc : </label> <span id="desc"></span></p> 
-</div>
-
-<script type="text/javascript"></script>
+    <div id="myData"></div>
+    <script>
+        fetch('http://localhost:8000/products/')
+            .then(function (response){
+                return response.json();
+            })
+            .then(function (data) {
+                appendData(data);
+            })
+            .catch(function (err) {
+                console.log('error: ' + err);
+            });
+        function appendData(data) {
+            var mainContainer = document.getElementById("myData");
+            debugger;
+            for (var i = 0; i < data.length; i++) {
+            
+                var div = document.createElement("div");
+                div.innerHTML = '<br><b>ID</b> :<br> ' + data[i].id + ' <br><b>NAME</b>: <br> ' + data[i].name + ' <br><b>price</b> :<br>'  + data[i].price + ' <br><b>Desc</b>: <br> ' + data[i].description + '<br><b>Image</b>: <br>' + data[i].image;
+                mainContainer.appendChild(div);
+            }
+        }
+    </script>
 </body>
-  <script type="text/javascript">
-  	$('.apireq').click( function() {
-      $.ajax({
-               url : "http://localhost:8000/products/",
-               dataType: "json",
-               success : function (data) {
-
-               debugger;
-
-                for (var i=0;i<data.length;i++){
-                        $('#id').text( data[i].id);
-                        $('#name').text( data[i].name);
-                        $('#price').text( data[i].price);
-                        $('#desc').text( data[i].description);
-
-                      }
-                     } 
-                   });
-               });
-  </script>
 </html>

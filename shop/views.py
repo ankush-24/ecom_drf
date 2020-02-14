@@ -25,8 +25,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 def home(request):
-    product = Product.objects.all()
-    return render(request,'index.html',{'product':product})
+    return render(request,'index.html')
 # class home(APIView):
 #     renderer_classes = [TemplateHTMLRenderer]
 #     template_name = 'index.html'
@@ -69,31 +68,21 @@ class ProductList(mixins.ListModelMixin,
     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ProductDetail(APIView):
+class ProductDetail(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-    def get_object(self, pk):
-        try:
-            return Product.objects.get(pk=pk)
-        except Product.DoesNotExist:
-            raise Http404
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializers
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
-    def get(self, request, pk, format=None):
-        cart = self.get_object(pk)
-        serializer = ProductSerializers(cart)
-        return Response(serializer.data)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
-    def put(self, request, pk, format=None):
-        product = self.get_object(pk)
-        serializer = ProductSerializers(product, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        product = self.get_object(pk)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
 
 class UserList(mixins.ListModelMixin,
                   mixins.CreateModelMixin,
