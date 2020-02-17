@@ -15,13 +15,11 @@
       <tr>
           <th>ID</th>
           <th>NAME</th>
-          <th>SELECt</th>
-          <!-- <input type="hidden" name="q" value="a"> -->
-<!--           <th>IMAGE</th>
+          <th>IMAGE</th>
           <th>PRICE</th>
           <th>DESCRIPTION</th>
-          <th>SELLER</th>
- -->      </tr>
+          <th>owner</th>
+      </tr>
   </table>
  </form>
   </div>
@@ -43,8 +41,11 @@
                 tr = $('<tr>');
                 tr.append("<td>" + data[i].id + "</td>");
                 tr.append("<td>" + data[i].name + "</td>");
-                var url = "/cart_detail/"+data[i].id;
-                tr.append("<a href = " + url + ">" + 'ShowData' + '</a>')
+                tr.append("<td>" + data[i].image + "</td>");
+                tr.append("<td>" + data[i].price + "</td>");
+                tr.append("<td>" + data[i].description + "</td>");
+                tr.append("<td>" + data[i].owner + "</td>");
+
                 $('table').append(tr);
                 
                 $(document).ready(function(){

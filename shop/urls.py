@@ -2,10 +2,11 @@ from django.urls import path
 from shop import views
 
 urlpatterns = [
-    path('', views.api_root),
-    path('home/',views.home,name='home'),
+    # path('', views.api_root),
+    path('',views.home,name='home'),
     path('products/', views.ProductList.as_view(),name = 'productlist'),
     path('products/<int:pk>/', views.ProductDetail.as_view(),name = 'productdetail'),
+    path('cart_detail/<int:pk>/', views.cart_detail,name = 'cart_detail'),
     path('user/', views.UserList.as_view(),name= 'userlist'),
 	path('user/<int:pk>/', views.UserDetail.as_view()),
 

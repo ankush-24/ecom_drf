@@ -14,6 +14,7 @@ from shop.permissions import IsOwnerOrReadOnly
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
@@ -23,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
 
-
+@csrf_exempt
 def home(request):
     return render(request,'index.html')
 # class home(APIView):
@@ -34,6 +35,27 @@ def home(request):
 #         queryset = Product.objects.all()
 #         return Response({'profiles': queryset})
 
+
+class list(APIView):
+    def get_object(self, pk):
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializers(user)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializers(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  
 @api_view(['GET'])
 def api_root(request, format=None):
     return Response({
@@ -68,21 +90,6 @@ class ProductList(mixins.ListModelMixin,
     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ProductDetail(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializers
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 class UserList(mixins.ListModelMixin,
                   mixins.CreateModelMixin,
@@ -118,6 +125,34 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ProductDetail(APIView):
+    def get(self, request, pk, format=None):
+        snippet = Product.objects.get(pk=pk)
+        serializer = ProductSerializers(snippet)
+        return Response(serializer.data)
+
+
+def cart_detail(request,pk,format=None):
+    product = Product.objects.get(pk=pk)
+    product=product.id
+    return render(request,'cart_detail.html',{'product':product})
+
+# class ProductDetail(mixins.RetrieveModelMixin,
+#                     mixins.UpdateModelMixin,
+#                     mixins.DestroyModelMixin,
+#                     generics.GenericAPIView):
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializers
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
+
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
 
 # class CartList(APIView):
 # 	def get(self, request, format= None):
