@@ -25,36 +25,64 @@
   </table>
  </form>
   </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-      <script type="text/javascript">
-           fetch('http://127.0.0.1:8000/products/')
-            .then(function (response){
-                return response.json();
-            })
-            .then(function (data) {
-                appendData(data);
-            })
-            .catch(function (err) {
-                console.log('error: ' + err);
-            });
-        function appendData(data) {
-            var tr;
-            for (var i = 0; i < data.length; i++) {
-                tr = $('<tr>');
-                tr.append("<td>" + data[i].id + "</td>");
-                tr.append("<td>" + data[i].name + "</td>");
-                var url = "/cart_detail/"+data[i].id;
-                tr.append("<a href = " + url + ">" + 'ShowData' + '</a>')
-                $('table').append(tr);
-                
-                $(document).ready(function(){
-                $("#submitBtn").click(function(){        
-                $("#myForm").submit(); // Submit the form
-    });
-});
-            }
-        }
-    </script>
+<title>students api</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ </head>
+<body>
+
+<button class="apireq">click me </button>
+</div>
+<div id="jsonresp" style="margin-top: 100px">
+   <p><label></label> <span id="pname"></span></p>
+   <p><label></label> <span id="price"></span></p>
+   <p><label></label> <span id="owner"></span></p>
+   <p><label></label> <span id="product_detail"></span></p>
+</div>
+    <script>
+    // $('.apireq').click( function() {
+    // var ajax = $.ajax({
+    //          url : "http://localhost:8000/products/",
+    //          type:"GET"
+    //          dataType: "json",
+    //          success : function (data) {
+    //                   $('#id').text( data[0].id);
+    //                   $('#name').text( data[0].name);
+    //                   $('#price').text( data[0].price);
+    //                   $('#owner').text( data[0].owner);
+    //                   $('#product_detail').text( data[0].product_detail);
+    //                        }
+    //              });
+    //          });    
+      </script>
+    <script>
+         fetch('http://localhost:8000/products/')
+             .then(function (response){
+                 return response.json();
+             })
+             .then(function (data) {
+                 appendData(data);
+             })
+             .catch(function (err) {
+                 console.log('error: ' + err);
+             });
+         function appendData(data) {
+             var mainContainer = document.getElementById("myData");
+             var tr;
+             for (var i = 0; i < data.length; i++) {
+                 debugger;
+                 tr = $('<tr/>');
+                 tr.append("<td>" + data[i].id + "</td>");
+                 tr.append("<td>" + data[i].name + "</td>");
+                 // tr.append("<td>" + data[i].price + "</td>");
+                 // var mylink = "SnippetDetail/" + 'data[i].id'
+                 var url = "products/"+data[i].id;
+                 // var url = "cart/"+data[i].id
+                 tr.append("<a href = " + url +">" + 'ShowDetail' + '</a>')
+                 $('table').append(tr);
+             }
+         } 
+
+      </script>
 </body>
 </html>
 
