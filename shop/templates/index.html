@@ -1,88 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title></title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-</head>
-<body>
-  <div class="container">
-<!--    <form action="/home/" method="post" id="myForm">  -->
-   <form> 
-    <table border=2 cellspacing="10" cellpadding="10">
-      <tr>
-          <th>ID</th>
-          <th>NAME</th>
-          <th>SELECt</th>
-          <!-- <input type="hidden" name="q" value="a"> -->
-<!--           <th>IMAGE</th>
-          <th>PRICE</th>
-          <th>DESCRIPTION</th>
-          <th>SELLER</th>
- -->      </tr>
-  </table>
- </form>
-  </div>
-<title>students api</title>
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
- </head>
-<body>
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <title></title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+   </head>
+   <body>
+      <div class="container" align="center">
+         <table border=2 cellspacing="10" cellpadding="10" id='list'>
+            <h3>PRODUCT LIST</h3>
+            <thead>
+               <th>ID</th>
+               <th>NAME</th>
+               <th colspan="2">
+                  <center>SELECT</center>
+               </th>
+            </thead>
+            <tr>
+            </tr>
+         </table>
+         <br>
+         <h3>PRODUCT LIST</h3>
+         <table border="3">
+            <thead>
+               <th>PRODUCT ID</th>
+               <th>PRODUCT IMAGE</th>
+               <th>PRODUCT NAME</th>
+               <th>PRODUCT PRICE</th>
+               <th>PRODUCT DETAIL</th>
+               <th>SELLER</th>
+            </thead>
+            <tr>
+               <td id="ID"></td>
+               <td id="IMAGE"></td>
+               <td id="NAME"></td>
+               <td id="PRICE"></td>
+               <td id="DETAIL"></td>
+               <td id="SELLER"></td>
+            </tr>
+         </table>
+      </div><br>
 
-<button class="apireq">click me </button>
+
+<div>
+    <form method="POST">
+      {% csrf_token %}
+<h3>ADD PRODUCT</h3>
+      <table>
+          NAME : <input type="text" name="name" id="name" ><br>
+          Price : <input type="text" name="price" id="price"><br>
+          Image : <input type="file" name="image" id="image"><br>
+          Description : <input type="text" name="description" id="desc"><br>
+          <input type="submit" value="submit" onclick="addCourse()" class="btn-lg btn btn-light" name="submit"><br>
+      </table>
+    </form>
 </div>
-<div id="jsonresp" style="margin-top: 100px">
-   <p><label></label> <span id="pname"></span></p>
-   <p><label></label> <span id="price"></span></p>
-   <p><label></label> <span id="owner"></span></p>
-   <p><label></label> <span id="product_detail"></span></p>
-</div>
-    <script>
-    // $('.apireq').click( function() {
-    // var ajax = $.ajax({
-    //          url : "http://localhost:8000/products/",
-    //          type:"GET"
-    //          dataType: "json",
-    //          success : function (data) {
-    //                   $('#id').text( data[0].id);
-    //                   $('#name').text( data[0].name);
-    //                   $('#price').text( data[0].price);
-    //                   $('#owner').text( data[0].owner);
-    //                   $('#product_detail').text( data[0].product_detail);
-    //                        }
-    //              });
-    //          });    
-      </script>
-    <script>
-         fetch('http://localhost:8000/products/')
-             .then(function (response){
-                 return response.json();
-             })
-             .then(function (data) {
-                 appendData(data);
-             })
-             .catch(function (err) {
-                 console.log('error: ' + err);
-             });
-         function appendData(data) {
-             var mainContainer = document.getElementById("myData");
-             var tr;
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+
+        data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
+        $.ajax({
+           url: 'http://127.0.0.1:8000/products/',
+           type:"GET",
+           data: data,
+           success: function appendData(data) {
+              // var mainContainer = document.getElementById("myData");
+                        var tr;
              for (var i = 0; i < data.length; i++) {
-                 debugger;
-                 tr = $('<tr/>');
-                 tr.append("<td>" + data[i].id + "</td>");
-                 tr.append("<td>" + data[i].name + "</td>");
-                 // tr.append("<td>" + data[i].price + "</td>");
-                 // var mylink = "SnippetDetail/" + 'data[i].id'
-                 var url = "products/"+data[i].id;
-                 // var url = "cart/"+data[i].id
-                 tr.append("<a href = " + url +">" + 'ShowDetail' + '</a>')
-                 $('table').append(tr);
+             tr = $('<tr>');
+             tr.append("<td>" + data[i].id + "</td>");
+             tr.append("<td>" + data[i].name + "</td>");
+             let id = data[i].id
+             console.log(id)
+             tr.append('<td><button onclick="showDetail('+ id +')"class="btn-lg btn btn-light">Product Detail</button></td>')
+             tr.append('<td><button onclick="destroy('+ id +')"class="btn-lg btn btn-light">Delete Product</button></td>')              
+             $('#list').append(tr);
+         }
+         }
+      })   
+         function showDetail(id) {
+           console.log(id);
+           url = 'http://127.0.0.1:8000/products/'+id+''
+            $.ajax({
+            url:url,
+            type:'GET',
+            dataType: "json",
+            success: function(data){
+                  $('#ID').text(data.id);
+                  $('#IMAGE').text(data.image);
+                  $('#NAME').text(data.name);
+                  $('#PRICE').text(data.price);
+                  $('#DETAIL').text(data.description);
+                  $('#SELLER').text(data.owner);
              }
-         } 
+         })
+}
+         function destroy(id) {
+         
+           console.log(id);
+           url = "http://127.0.0.1:8000/products/"+id+"/destroy/"
+           data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
+             $.ajax({
+                url: url,
+                type:"DELETE",
+                data: data,
+                success: function (data) {
+                    // alert("A Product has been deleted.");
+                }
+              })
+         }
 
-      </script>
-</body>
+</script>
+<script type="text/javascript">
+  
+
+ function addCourse()
+    {
+       url = 'http://127.0.0.1:8000/create/' ,
+       d = {csrfmiddlewaretoken: "{{ csrf_token }}"}
+          // debugger;
+       $.ajax(
+          { 
+          'url': url,
+          'data' : d ,
+          'type' : "POST",
+          'dataType':'json',
+          'data': {
+
+                       "name" : $("#name").val(),
+                       "price" : $("#price").val(),
+                       "image" : $("#image").val(),
+                       "description" : $("#desc").val()
+
+                     },
+             success : function data()
+
+                      {
+                      }  
+             
+             // error :  function data()
+             // {}
+                          // {
+                          //   alert("Could not add course!");
+                          // }
+          }
+      ); // ajax()
+    }
+</script>
+
+   </body>
 </html>
+
+
 

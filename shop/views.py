@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from shop.serializers import ProductSerializers,CartSerializers,OrderSerializers,UserSerializers
+from shop.serializers import ProductcreateSerializers,ProductlistSerializers,ProductdetailSerializers,UserSerializers
 from shop.models import(Product,Cart,Order)
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
@@ -15,6 +15,7 @@ from rest_framework import generics
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
+from django.db import IntegrityError
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
@@ -36,6 +37,99 @@ def home(request):
 #         return Response({'profiles': queryset})
 
 
+  
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'product': reverse('productlist', request=request, format=format),
+        # 'cart': reverse('cartlist', request=request, format=format),
+        # 'order':reverse('orderlist',request=request,format=format),
+        'user' : reverse('userlist',request=request,format=format),
+    })
+
+class ProductList(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class= ProductlistSerializers
+
+
+
+class ProductDetail(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    def get_object(self, pk):
+        try:
+            return Product.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = ProductdetailSerializers(user)
+        return Response(serializer.data)
+
+
+class Productdestroy(generics.DestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class= ProductlistSerializers
+                
+
+class Productcreate(generics.CreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class= ProductcreateSerializers
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # def create(self, request, *args, **kwargs):
+    #     try:
+    #         return super(generics.CreateAPIView,self).create(request, *args, **kwargs)
+    #     except IntegrityError:
+    #         return bad_request(request)
+
+
+    # def post(self, request, format=None):
+    #     serializer = ProductcreateSerializers(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+    # permission_classes = (IsAuthenticated,)
+    # def get(self, request, *args, **kwargs):
+    #     return self.list(request, *args, **kwargs)
+
+    # def post(self, request, *args, **kwargs):
+    #     return self.create(request, *args, **kwargs)
+    # def get(self, request, format= None):
+    #     return Response(serializer.data)
+    
+    # def perform_create(self, serializer):
+    #     serializer.save(owner=self.request.user)    
+	
+    # def post(self, request, format=None):
+    #     serializer = ProductSerializers(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# class ProductDetail(APIView):
+    
+#     def get(self, request, pk, format=None):
+#         snippet = Product.objects.get(pk=pk)
+#         serializer = ProductSerializers(snippet)
+#         return Response(serializer.data)
+
+
+# def cart_detail(request,pk,format=None):
+#     product = Product.objects.get(pk=pk)
+#     product=product.id
+#     return render(request,'cart_detail.html',{'product':product})
+
 class list(APIView):
     def get_object(self, pk):
         try:
@@ -55,40 +149,6 @@ class list(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-  
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'product': reverse('productlist', request=request, format=format),
-        # 'cart': reverse('cartlist', request=request, format=format),
-        # 'order':reverse('orderlist',request=request,format=format),
-        'user' : reverse('userlist',request=request,format=format),
-    })
-
-class ProductList(mixins.ListModelMixin,
-                  mixins.CreateModelMixin,
-                  generics.GenericAPIView):
-    queryset = Product.objects.all()
-    serializer_class= ProductSerializers
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-    permission_classes = (IsAuthenticated,)
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-    # def get(self, request, format= None):
-    #     return Response(serializer.data)
-    
-    # def perform_create(self, serializer):
-    #     serializer.save(owner=self.request.user)    
-	
-    # def post(self, request, format=None):
-    #     serializer = ProductSerializers(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserList(mixins.ListModelMixin,
@@ -125,19 +185,6 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class ProductDetail(APIView):
-    def get(self, request, pk, format=None):
-        snippet = Product.objects.get(pk=pk)
-        serializer = ProductSerializers(snippet)
-        return Response(serializer.data)
-
-
-def cart_detail(request,pk,format=None):
-    product = Product.objects.get(pk=pk)
-    product=product.id
-    return render(request,'cart_detail.html',{'product':product})
-
 # class ProductDetail(mixins.RetrieveModelMixin,
 #                     mixins.UpdateModelMixin,
 #                     mixins.DestroyModelMixin,

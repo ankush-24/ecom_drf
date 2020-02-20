@@ -17,18 +17,26 @@ class UserSerializers(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
-class ProductSerializers(serializers.ModelSerializer):
+class ProductlistSerializers(serializers.ModelSerializer):
+    # owner = serializers.ReadOnlyField(source='owner.username')
+    class Meta:
+        model = Product
+        fields = ['id','name']
+
+class ProductdetailSerializers(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Product
         fields = '__all__'
 
-class CartSerializers(serializers.ModelSerializer):
+class ProductcreateSerializers(serializers.ModelSerializer):
+    # owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
-        model = Cart
+        model = Product
         fields = '__all__'
 
-class OrderSerializers(serializers.ModelSerializer):
-    class Meta:
-        model=Order
-        fields = '__all__'
+# class ProductdestroySerializers(serializers.ModelSerializer):
+#     owner = serializers.ReadOnlyField(source='owner.username')
+#     class Meta:
+#         model = Product
+#         fields = '__all__'
