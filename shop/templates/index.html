@@ -1,13 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title></title>
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-   </head>
-   <body>
+{% extends 'base.html' %}
+{% block content %}
       <div class="container" align="center">
          <table border=2 cellspacing="10" cellpadding="10" id='list'>
             <h3>PRODUCT LIST</h3>
@@ -46,16 +38,25 @@
 
 <div>
     <form method="POST">
-      {% csrf_token %}
-<h3>ADD PRODUCT</h3>
-      <table>
-          NAME : <input type="text" name="name" id="name" ><br>
-          Price : <input type="text" name="price" id="price"><br>
-          Image : <input type="file" name="image" id="image"><br>
-          Description : <input type="text" name="description" id="desc"><br>
-          <input type="submit" value="submit" onclick="addCourse()" class="btn-lg btn btn-light" name="submit"><br>
-      </table>
-    </form>
+  {% csrf_token %}
+<h1>fill detail here</h1>
+prouduct_name <br/>
+<input type="text" id="pname"/>
+<br/>
+price <br/>
+<input type="number" id="price"/>
+<br/>
+image
+<input type="file" src="/wp-content/uploads/sendform.png" id ='img' alt="Submit" width="100">
+<br>
+<br>
+product detail<br/>
+<input type="text" id="product_detail"/>
+<p/>
+<p/>
+<button onclick="addCourse()" id="Save">submit </button>
+</p>
+</form>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -108,51 +109,58 @@
                 type:"DELETE",
                 data: data,
                 success: function (data) {
-                    // alert("A Product has been deleted.");
+                    // alert("you sure u want to delete?");
                 }
               })
          }
 
 </script>
 <script type="text/javascript">
-  
 
- function addCourse()
-    {
-       url = 'http://127.0.0.1:8000/create/' ,
-       d = {csrfmiddlewaretoken: "{{ csrf_token }}"}
-          // debugger;
-       $.ajax(
-          { 
-          'url': url,
-          'data' : d ,
-          'type' : "POST",
-          'dataType':'json',
-          'data': {
-
-                       "name" : $("#name").val(),
-                       "price" : $("#price").val(),
-                       "image" : $("#image").val(),
-                       "description" : $("#desc").val()
-
-                     },
-             success : function data()
-
-                      {
-                      }  
-             
-             // error :  function data()
-             // {}
-                          // {
-                          //   alert("Could not add course!");
-                          // }
+$(document).ready(function () {
+             $("#Save").click(function () {
+       var person = new Object();
+          person.pname = $('#pname').val();
+          person.price = $('#price').val();
+          // person.image = $('#image').val();
+          person.product_detail = $('#product_detail').val();
+          person.owner = $('#owner').val();
+    console.log(person)
+    debugger;
+    var formData = new FormData();
+    var file = $('#img')[0].files[0]
+    var token = "{{ csrf_token }}"
+    // add assoc key values, this will be posts values
+    formData.append("image", file, file.name);
+    formData.append("name", person.pname);
+    formData.append("price", person.price);
+    formData.append("description", person.product_detail);
+    formData.append("csrfmiddlewaretoken", token);
+    url='http://localhost:8000/create/',   
+         $.ajax({
+          type: "POST",
+          enctype: 'multipart/form-data',
+          url:url,
+          data: formData,
+          processData: false,
+          contentType: false,
+          cache: false,
+          timeout: 600000,
+          success: function (data) {
+              // $("#result").text(data);
+              console.log("SUCCESS : ", data);
+              // $("#btnSubmit").prop("disabled", false);
+          },
+          error: function (e) {
+              // $("#result").text(e.responseText);
+              console.log("ERROR : ", e);
+              // $("#btnSubmit").prop("disabled", false);
           }
-      ); // ajax()
-    }
+      });
+     });
+});
 </script>
-
-   </body>
-</html>
-
-
+</div>
+{% endblock %}
+   
 

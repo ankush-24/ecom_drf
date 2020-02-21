@@ -16,6 +16,9 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
+from allauth.account.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required, permission_required
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
@@ -24,8 +27,8 @@ from django.db import IntegrityError
 # class UserDetail(generics.RetrieveAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
-
 @csrf_exempt
+@login_required
 def home(request):
     return render(request,'index.html')
 # class home(APIView):
@@ -37,7 +40,11 @@ def home(request):
 #         return Response({'profiles': queryset})
 
 
-  
+def Logout(request):
+    logout(request)
+    return HttpResponseRedirect('/')  
+
+
 @api_view(['GET'])
 def api_root(request, format=None):
     return Response({
@@ -47,33 +54,51 @@ def api_root(request, format=None):
         'user' : reverse('userlist',request=request,format=format),
     })
 
-class ProductList(generics.ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class= ProductlistSerializers
-
+class ProductList(APIView):
+   def get(self, request, format=None):
+        queryset = Product.objects.all()
+        serializer= ProductlistSerializers(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ProductDetail(generics.RetrieveAPIView):
     queryset = Product.objects.all()
-    def get_object(self, pk):
-        try:
-            return Product.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404
+    
+    # @method_decorator(login_required)
     def get(self, request, pk, format=None):
-        user = self.get_object(pk)
+        user = self.get_object()
         serializer = ProductdetailSerializers(user)
         return Response(serializer.data)
 
-
+# @method_decorator(login_required, name='dispatch')
 class Productdestroy(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class= ProductlistSerializers
                 
+# @method_decorator(login_required, name='dispatch')
+# class Productcreate(generics.CreateAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class= ProductcreateSerializers
 
-class Productcreate(generics.CreateAPIView):
+# class Productcreate(generics.CreateAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductcreateSerializers     
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
+
+class Productcreate(mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  generics.GenericAPIView):
     queryset = Product.objects.all()
-    serializer_class= ProductcreateSerializers
+    serializer_class = ProductcreateSerializers
+
+    # def get(self, request, *args, **kwargs):
+    #     return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)    
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+    # permission_classes = (IsAuthenticated,)
     # def create(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data)
     #     serializer.is_valid(raise_exception=True)
@@ -130,61 +155,27 @@ class Productcreate(generics.CreateAPIView):
 #     product=product.id
 #     return render(request,'cart_detail.html',{'product':product})
 
-class list(APIView):
-    def get_object(self, pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404
+# class list(APIView):
+#     def get_object(self, pk):
+#         try:
+#             return User.objects.get(pk=pk)
+#         except User.DoesNotExist:
+#             raise Http404
 
-    def get(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializers(user)
-        return Response(serializer.data)
+#     def get(self, request, pk, format=None):
+#         user = self.get_object(pk)
+#         serializer = UserSerializers(user)
+#         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializers(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     def put(self, request, pk, format=None):
+#         user = self.get_object(pk)
+#         serializer = UserSerializers(user, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserList(mixins.ListModelMixin,
-                  mixins.CreateModelMixin,
-                  generics.GenericAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializers
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-class UserDetail(APIView):
-    def get_object(self, pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializers(user)
-        return Response(serializer.data)
-
-    def put(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializers(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    def delete(self, request, pk, format=None):
-        user = self.get_object(pk)
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 # class ProductDetail(mixins.RetrieveModelMixin,
 #                     mixins.UpdateModelMixin,
 #                     mixins.DestroyModelMixin,
@@ -270,3 +261,38 @@ class UserDetail(APIView):
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
+# class UserList(mixins.ListModelMixin,
+#                   mixins.CreateModelMixin,
+#                   generics.GenericAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializers
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
+
+# class UserDetail(APIView):
+#     def get_object(self, pk):
+#         try:
+#             return User.objects.get(pk=pk)
+#         except User.DoesNotExist:
+#             raise Http404
+
+#     def get(self, request, pk, format=None):
+#         user = self.get_object(pk)
+#         serializer = UserSerializers(user)
+#         return Response(serializer.data)
+
+#     def put(self, request, pk, format=None):
+#         user = self.get_object(pk)
+#         serializer = UserSerializers(user, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     def delete(self, request, pk, format=None):
+#         user = self.get_object(pk)
+#         user.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)

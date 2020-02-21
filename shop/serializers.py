@@ -30,7 +30,7 @@ class ProductdetailSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductcreateSerializers(serializers.ModelSerializer):
-    # owner = serializers.ReadOnlyField(source='owner.username')
+    owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Product
         fields = '__all__'
