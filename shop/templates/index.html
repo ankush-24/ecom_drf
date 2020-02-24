@@ -1,166 +1,170 @@
 {% extends 'base.html' %}
 {% block content %}
-      <div class="container" align="center">
-         <table border=2 cellspacing="10" cellpadding="10" id='list'>
-            <h3>PRODUCT LIST</h3>
-            <thead>
-               <th>ID</th>
-               <th>NAME</th>
-               <th colspan="2">
-                  <center>SELECT</center>
-               </th>
-            </thead>
-            <tr>
-            </tr>
-         </table>
-         <br>
-         <h3>PRODUCT LIST</h3>
-         <table border="3">
-            <thead>
-               <th>PRODUCT ID</th>
-               <th>PRODUCT IMAGE</th>
-               <th>PRODUCT NAME</th>
-               <th>PRODUCT PRICE</th>
-               <th>PRODUCT DETAIL</th>
-               <th>SELLER</th>
-            </thead>
-            <tr>
-               <td id="ID"></td>
-               <td id="IMAGE"></td>
-               <td id="NAME"></td>
-               <td id="PRICE"></td>
-               <td id="DETAIL"></td>
-               <td id="SELLER"></td>
-            </tr>
-         </table>
-      </div><br>
+{{user}}
 
-
-<div>
-    <form method="POST">
-  {% csrf_token %}
-<h1>fill detail here</h1>
-prouduct_name <br/>
-<input type="text" id="pname"/>
-<br/>
-price <br/>
-<input type="number" id="price"/>
-<br/>
-image
-<input type="file" src="/wp-content/uploads/sendform.png" id ='img' alt="Submit" width="100">
-<br>
-<br>
-product detail<br/>
-<input type="text" id="product_detail"/>
-<p/>
-<p/>
-<button onclick="addCourse()" id="Save">submit </button>
-</p>
-</form>
+<div class="container" align="center">
+   <table border=2 cellspacing="10" cellpadding="10" id='list'>
+      <h3>PRODUCT LIST</h3>
+      <thead>
+         <th>ID</th>
+         <th>NAME</th>
+         <th colspan="3">
+            <center>SELECT</center>
+         </th>
+      </thead>
+      <tr>
+      </tr>
+   </table>
+   <br>
+   <h3>PRODUCT LIST</h3>
+   <table border="3">
+      <thead>
+         <th>PRODUCT ID</th>
+         <th>PRODUCT IMAGE</th>
+         <th>PRODUCT NAME</th>
+         <th>PRODUCT PRICE</th>
+         <th>PRODUCT DETAIL</th>
+         <th>SELLER</th>
+      </thead>
+      <tr>
+         <td id="ID"></td>
+         <td id="IMAGE"></td>
+         <td id="NAME"></td>
+         <td id="PRICE"></td>
+         <td id="DETAIL"></td>
+         <td id="SELLER"></td>
+      </tr>
+   </table>
 </div>
-
+<br>
+<div>
+  <h1>CREATE PRODUCT</h1>
+  <button class="btn-lg btn btn-blue">Click Here</button>
+   <form id='form1'>
+      {% csrf_token %}
+      <h1></h1>
+      prouduct_name <br/>
+      <input type="text" id="pname"/>
+      <br/>
+      price <br/>
+      <input type="number" id="price"/>
+      <br/>
+      image
+      <input type="file" src="/wp-content/uploads/sendform.png"  id ='img' alt="Submit" width="100">
+      <br>
+      <br>
+      product detail<br/>
+      <input type="text" id="product_detail"/>
+      <p/>
+         <button id="Save">submit </button>
+      </p>
+   </form>
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
-
-        data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
+   data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
+   $.ajax({
+      url: 'http://127.0.0.1:8000/products/',
+      type:"GET",
+      data: data,
+      success: function appendData(data) {
+         // var mainContainer = document.getElementById("myData");
+                   var tr;
+        for (var i = 0; i < data.length; i++) {
+        tr = $('<tr>');
+        tr.append("<td>" + data[i].id + "</td>");
+        tr.append("<td>" + data[i].name + "</td>");
+        let id = data[i].id
+        console.log(id)
+        tr.append('<td><button onclick="showDetail('+ id +')"class="btn-lg btn btn-light">Product Detail</button></td>')
+        tr.append('<td><button onclick="destroy('+ id +')"class="btn-lg btn btn-light">Delete Product</button></td>')
+        tr.append('<td><button onclick="update('+ id +')"class="btn-lg btn btn-light">Update Product</button></td>')               
+        $('#list').append(tr);
+    }
+    }
+   })   
+    function showDetail(id) {
+      console.log(id);
+      url = 'http://127.0.0.1:8000/products/'+id+''
+       $.ajax({
+       url:url,
+       type:'GET',
+       dataType: "json",
+       success: function(data){
+             $('#ID').text(data.id);
+             $('#IMAGE').text(data.image);
+             $('#NAME').text(data.name);
+             $('#PRICE').text(data.price);
+             $('#DETAIL').text(data.description);
+             $('#SELLER').text(data.owner);
+        }
+    })
+   }
+    function destroy(id) {
+    
+      console.log(id);
+      url = "http://127.0.0.1:8000/products/"+id+"/destroy/"
+      data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
         $.ajax({
-           url: 'http://127.0.0.1:8000/products/',
-           type:"GET",
+           url: url,
+           type:"DELETE",
            data: data,
-           success: function appendData(data) {
-              // var mainContainer = document.getElementById("myData");
-                        var tr;
-             for (var i = 0; i < data.length; i++) {
-             tr = $('<tr>');
-             tr.append("<td>" + data[i].id + "</td>");
-             tr.append("<td>" + data[i].name + "</td>");
-             let id = data[i].id
-             console.log(id)
-             tr.append('<td><button onclick="showDetail('+ id +')"class="btn-lg btn btn-light">Product Detail</button></td>')
-             tr.append('<td><button onclick="destroy('+ id +')"class="btn-lg btn btn-light">Delete Product</button></td>')              
-             $('#list').append(tr);
-         }
-         }
-      })   
-         function showDetail(id) {
-           console.log(id);
-           url = 'http://127.0.0.1:8000/products/'+id+''
-            $.ajax({
-            url:url,
-            type:'GET',
-            dataType: "json",
-            success: function(data){
-                  $('#ID').text(data.id);
-                  $('#IMAGE').text(data.image);
-                  $('#NAME').text(data.name);
-                  $('#PRICE').text(data.price);
-                  $('#DETAIL').text(data.description);
-                  $('#SELLER').text(data.owner);
-             }
+           success: function (data) {
+               // alert("you sure u want to delete?");
+           }
          })
-}
-         function destroy(id) {
-         
-           console.log(id);
-           url = "http://127.0.0.1:8000/products/"+id+"/destroy/"
-           data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
-             $.ajax({
-                url: url,
-                type:"DELETE",
-                data: data,
-                success: function (data) {
-                    // alert("you sure u want to delete?");
-                }
-              })
-         }
-
+    }
+   
 </script>
 <script type="text/javascript">
-
-$(document).ready(function () {
-             $("#Save").click(function () {
-       var person = new Object();
-          person.pname = $('#pname').val();
-          person.price = $('#price').val();
-          // person.image = $('#image').val();
-          person.product_detail = $('#product_detail').val();
-          person.owner = $('#owner').val();
-    console.log(person)
-    debugger;
-    var formData = new FormData();
-    var file = $('#img')[0].files[0]
-    var token = "{{ csrf_token }}"
-    // add assoc key values, this will be posts values
-    formData.append("image", file, file.name);
-    formData.append("name", person.pname);
-    formData.append("price", person.price);
-    formData.append("description", person.product_detail);
-    formData.append("csrfmiddlewaretoken", token);
-    url='http://localhost:8000/create/',   
-         $.ajax({
-          type: "POST",
-          enctype: 'multipart/form-data',
-          url:url,
-          data: formData,
-          processData: false,
-          contentType: false,
-          cache: false,
-          timeout: 600000,
-          success: function (data) {
-              // $("#result").text(data);
-              console.log("SUCCESS : ", data);
-              // $("#btnSubmit").prop("disabled", false);
-          },
-          error: function (e) {
-              // $("#result").text(e.responseText);
-              console.log("ERROR : ", e);
-              // $("#btnSubmit").prop("disabled", false);
-          }
-      });
-     });
+  $(document).ready(function(){
+  $("button").click(function(){
+    $("form").toggle();
+  });
 });
 </script>
-</div>
-{% endblock %}
+<script type="text/javascript">
+   $(document).ready(function () {  
+                $("#Save").click(function () { 
+       var formData = new FormData();
+       var file = $('#img')[0].files[0] 
+       var token = "{{ csrf_token }}"
+       var name = $('#pname').val();
+       var price = $('#price').val();
+       var product_detail = $('#product_detail').val();
+       // var owner = $('#owner').val();
+       formData.append("image", file, file.name);
+       formData.append("name", name);
+       formData.append("price", price);
+       formData.append("description",product_detail);
+       // formData.append("description",product_detail);   
+       formData.append("csrfmiddlewaretoken", token);
+       url = 'http://localhost:8000/create/'
+       console.log(url)
+       debugger
+            $.ajax({
+             type: "POST",
+             enctype: 'multipart/form-data',
+             url:url,
+             data: formData,
+             processData: false,
+             contentType: false,
+             cache: false,
+             timeout: 600000,
+             success: function (data) {
+               alert('product add successfully')
+                 console.log("SUCCESS : ", data);
    
+             },
+             error: function (data) {
+               alert('something went wrong')
+                 console.log("ERROR : ", e);
+   
+             }
+         });
+        });
+   });
+</script>
+</div>
 
+{% endblock %}

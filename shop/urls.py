@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from shop import views
 
 urlpatterns = [
@@ -6,10 +6,14 @@ urlpatterns = [
     path('',views.home,name='home'),
     
     path('products/', views.ProductList.as_view(),name = 'productlist'),
+
+    
     
     path('products/<int:pk>/', views.ProductDetail.as_view(),name = 'productdetail'),
 
     path('products/<int:pk>/destroy/',views.Productdestroy.as_view(),name = 'productdestroy'),
+
+    path('update/<int:pk>/',views.ProductUpdate.as_view(),name='productupdate'),
 
     path('create/', views.Productcreate.as_view(),name = 'productcreate'),    
 
