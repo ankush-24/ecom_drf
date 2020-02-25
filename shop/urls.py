@@ -17,6 +17,8 @@ urlpatterns = [
 
     path('create/', views.Productcreate.as_view(),name = 'productcreate'),    
 
+    path('user/', views.UserList.as_view(), name= 'userlist'),
+    path('user/<int:pk>/', views.UserDetail.as_view(), name = 'userdetail'),
     
 
     # path('cart_detail/<int:pk>/', views.cart_detail,name = 'cart_detail'),
@@ -31,8 +33,6 @@ urlpatterns = [
     # path('order/', views.OrderList.as_view(), name= 'orderlist'),
     # path('order/<int:pk>/', views.OrderDetail.as_view(), name = 'orderdetail'),
     
-    # path('user/', views.UserList.as_view(), name= 'userlist'),
-    # path('user/<int:pk>/', views.UserDetail.as_view(), name = 'userdetail'),
 
 ]
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from shop.serializers import ProductCreateSerializers,ProductlistSerializers,ProductdetailSerializers,ProductUpdateSerializers,UserSerializers
+from shop.serializers import UserSerializer,ProductCreateSerializers,ProductlistSerializers,ProductdetailSerializers,ProductUpdateSerializers
 from shop.models import(Product,Cart,Order)
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
@@ -21,14 +21,14 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required, permission_required
 from rest_framework.parsers import MultiPartParser, FormParser
 
-# class UserList(generics.ListAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
-# class UserDetail(generics.RetrieveAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 @csrf_exempt
 @login_required
 def home(request):
@@ -105,15 +105,28 @@ class Productcreate(generics.CreateAPIView):
     #     return obj.owner == request.user    
 
 
-class ProductUpdate(generics.RetrieveUpdateAPIView):
+class ProductUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductUpdateSerializers
-    parser_classes = (MultiPartParser, FormParser)
+    # def get(self, request, *args, **kwargs):
+    #     return self.retrieve(request, *args, **kwargs)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)    
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
+    # parser_classes = (MultiPartParser, FormParser)
+    # def get(self, request, pk, format=None):
+    #     user = self.get_object()
+    #     serializer = ProductUpdateSerializers(user)
+    #     return Response(serializer.data)
+    # def put(self, request, *args, **kwargs):
+    #     return self.update(request, *args, **kwargs)  
 # class Productcreate(mixins.ListModelMixin,
 #                   mixins.CreateModelMixin,
 #                   generics.GenericAPIView):
 #     queryset = Product.objects.all()
+
 #     serializer_class = ProductcreateSerializers
 
 #     # def get(self, request, *args, **kwargs):

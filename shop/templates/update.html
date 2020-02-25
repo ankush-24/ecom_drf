@@ -1,0 +1,115 @@
+<!-- {% extends 'base.html' %}
+{% block content %}
+{{user}}
+
+
+<h1>UPDATE PRODUCT</h1>
+  <button class="btn-lg btn btn-blue">Click Here</button>
+   <form id='form1'>
+      {% csrf_token %}
+      <h1></h1>
+      prouduct_name <br/>
+      <input type="text" id="pname"/>
+      <br/>
+      price <br/>
+      <input type="number" id="price"/>
+      <br/>
+      image
+      <input type="file" src="/wp-content/uploads/sendform.png"  id ='img' alt="Submit" width="100">
+      <br>
+      <br>
+      product detail<br/>
+      <input type="text" id="product_detail"/>
+      <p/>
+         <button id="Save">submit </button>
+      </p>
+   </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script><script type="text/javascript">
+ data = {csrfmiddlewaretoken: "{{ csrf_token }}" },
+   $.ajax({
+      url: 'http://127.0.0.1:8000/products/',
+      type:"GET",
+      data: data,
+      success: function appendData(data) {
+         // var mainContainer = document.getElementById("myData");
+                   var tr;
+        for (var i = 0; i < data.length; i++) {
+        tr = $('<tr>');
+        tr.append("<td>" + data[i].id + "</td>");
+        tr.append("<td>" + data[i].name + "</td>");
+        let id = data[i].id
+        console.log(id)
+        tr.append('<td><button onclick="showDetail('+ id +')"class="btn-lg btn btn-light">Product Detail</button></td>')
+        tr.append('<td><button onclick="destroy('+ id +')"class="btn-lg btn btn-light">Delete Product</button></td>')
+        tr.append('<td><button onclick="update('+ id +')"class="btn-lg btn btn-light">Update Product</button></td>')               
+        $('#list').append(tr);
+    }
+    }
+   })
+   $(document).ready(function () {  
+                $("#Save").click(function () { 
+       var formData = new FormData();
+       var file = $('#img')[0].files[0] 
+       var token = "{{ csrf_token }}"
+       var name = $('#pname').val();
+       var price = $('#price').val();
+       var product_detail = $('#product_detail').val();
+       // var owner = $('#owner').val();
+       formData.append("image", file, file.name);
+       formData.append("name", name);
+       formData.append("price", price);
+       formData.append("description",product_detail);
+       // formData.append("description",product_detail);   
+       formData.append("csrfmiddlewaretoken", token);
+       url = 'http://localhost:8000/create/'
+       console.log(url)
+       debugger
+            $.ajax({
+             type: "POST",
+             enctype: 'multipart/form-data',
+             url:url,
+             data: formData,
+             processData: false,
+             contentType: false,
+             cache: false,
+             timeout: 600000,
+             success: function (data) {
+               alert('product add successfully')
+                 console.log("SUCCESS : ", data);
+   
+             },
+             error: function (data) {
+               alert('something went wrong')
+                 console.log("ERROR : ", e);
+   
+             }
+         });
+        });
+   });
+
+        $( document ).ready(function() {
+          console.log( "ready!" );
+          debugger;
+         $.ajax({
+             type: "PATCH",
+             url:'http://localhost:8000/update/3/',
+             data: {'name':'ank',
+                    'csrfmiddlewaretoken':'{{ csrf_token }}'},
+
+             success: function (data) {
+               alert('product updated successfully')
+                 console.log("SUCCESS : ", data);
+   
+             },
+             error: function (data) {
+               alert('something went wrong')
+                 console.log("ERROR : ", e);
+   
+             }
+         });
+});   
+
+</script> -->
