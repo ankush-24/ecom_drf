@@ -7,7 +7,7 @@ urlpatterns = [
     
     path('products/', views.ProductList.as_view(),name = 'productlist'),
 
-    
+    path('Costumer/', views.Costumer.as_view(), name='Costumer'),
     
     path('products/<int:pk>/', views.ProductDetail.as_view(),name = 'productdetail'),
 
@@ -15,10 +15,12 @@ urlpatterns = [
 
     path('update/<int:pk>/',views.ProductUpdate.as_view(),name='productupdate'),
 
-    path('create/', views.Productcreate.as_view(),name = 'productcreate'),    
+    path('create/', views.Productcreate.as_view(),name = 'productcreate'),
 
-    path('user/', views.UserList.as_view(), name= 'userlist'),
-    path('user/<int:pk>/', views.UserDetail.as_view(), name = 'userdetail'),
+    path('productuser/<int:pk>/',views.UserProduct.as_view(),name='UserProduct')
+
+    # path('user/', views.UserList.as_view(), name= 'userlist'),
+    # path('user/<int:pk>/', views.UserDetail.as_view(), name = 'userdetail'),
     
 
     # path('cart_detail/<int:pk>/', views.cart_detail,name = 'cart_detail'),

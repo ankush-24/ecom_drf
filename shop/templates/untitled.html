@@ -1,6 +1,3 @@
-
-
-
 <!-- <div>
   <h1>CREATE PRODUCT</h1>
   
@@ -24,6 +21,48 @@
       </p>
    </form>
 </div> -->
+<!-- 
+
+
+
+$("#Save").click(function() {
+var formData = new FormData();
+// var file = $('#img')[0].files[0] 
+var token = "{{ csrf_token }}"
+var name = $('#pname').val();
+var price = $('#price').val();
+var product_detail = $('#product_detail').val();
+// var owner = $('#owner').val();
+formData.append("image", file, file.name);
+formData.append("name", name);
+formData.append("price", price);
+formData.append("description", product_detail);
+// formData.append("description",product_detail);   
+formData.append("csrfmiddlewaretoken", token);
+url = 'http://localhost:8000/create/'
+console.log(url)
+// debugger;
+$.ajax({
+    type: "POST",
+    enctype: 'multipart/form-data',
+    url: url,
+    data: formData,
+    processData: false,
+    contentType: false,
+    cache: false,
+    timeout: 600000,
+    success: function(data) {
+        alert('product add successfully')
+        console.log("SUCCESS : ", data);
+
+    },
+    error: function(data) {
+        alert('something went wrong')
+        console.log("ERROR : ", e);
+
+    }
+});
+});
 
 
 
@@ -44,4 +83,4 @@
 //              // $('#SELLER').text(data.owner);
 //         }
 //     })
-//    }
+//    } -->

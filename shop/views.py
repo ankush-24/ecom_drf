@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from shop.serializers import UserSerializer,ProductCreateSerializers,ProductlistSerializers,ProductdetailSerializers,ProductUpdateSerializers
-from shop.models import(Product,Cart,Order)
+from shop.serializers import CostumerSerializers,UserProductSerializers,ProductCreateSerializers,ProductlistSerializers,ProductdetailSerializers,ProductUpdateSerializers
+from shop.models import(Product,Cart,Order,Costumer)
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,26 +21,28 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required, permission_required
 from rest_framework.parsers import MultiPartParser, FormParser
 
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserList(generics.ListAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserDetail(generics.RetrieveAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+class Costumer(generics.ListCreateAPIView):
+   queryset = Costumer.objects.all()
+   serializer_class = CostumerSerializers
+
+class UserProduct(generics.RetrieveUpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = UserProductSerializers
+
+
 @csrf_exempt
 @login_required
 def home(request):
     user = request.user
     return render(request,'index.html',{'user':user})
-# class home(APIView):
-#     renderer_classes = [TemplateHTMLRenderer]
-#     template_name = 'index.html'
-
-#     def get(self, request):
-#         queryset = Product.objects.all()
-#         return Response({'profiles': queryset})
 
 
 def Logout(request):
@@ -52,9 +54,9 @@ def Logout(request):
 def api_root(request, format=None):
     return Response({
         'product': reverse('productlist', request=request, format=format),
+        'user' : reverse('userlist',request=request,format=format),
         # 'cart': reverse('cartlist', request=request, format=format),
         # 'order':reverse('orderlist',request=request,format=format),
-        'user' : reverse('userlist',request=request,format=format),
     })
 
 class ProductList(APIView):
@@ -68,16 +70,19 @@ class ProductList(APIView):
 
 class ProductDetail(generics.RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all()    
     # @method_decorator(login_required)
     def get(self, request, pk, format=None):
         user = self.get_object()
         serializer = ProductdetailSerializers(user)
         return Response(serializer.data)
+        
 
 # @method_decorator(login_required, name='dispatch')
 class Productdestroy(generics.DestroyAPIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class= ProductlistSerializers
                 
@@ -92,7 +97,7 @@ class Productdestroy(generics.DestroyAPIView):
 #         return obj.owner == request.user
 
 class Productcreate(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]    
+    # permission_classes = [permissions.IsAuthenticated]    
     queryset = Product.objects.all()
     serializer_class = ProductCreateSerializers     
     def perform_create(self, serializer):
@@ -105,15 +110,10 @@ class Productcreate(generics.CreateAPIView):
     #     return obj.owner == request.user    
 
 
-class ProductUpdate(generics.RetrieveUpdateDestroyAPIView):
+class ProductUpdate(generics.UpdateAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductUpdateSerializers
-    # def get(self, request, *args, **kwargs):
-    #     return self.retrieve(request, *args, **kwargs)
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)    
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
     # parser_classes = (MultiPartParser, FormParser)
     # def get(self, request, pk, format=None):

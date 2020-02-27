@@ -16,7 +16,7 @@
         </tr>
     </table>
     <br>
-    <h3>PRODUCT LIST</h3>
+    <h3>PRODUCT DETAIL</h3>
     <table border="3">
         <thead>
             <th>PRODUCT ID</th>
@@ -36,6 +36,31 @@
         </tr>
     </table>
 </div>
+
+
+<h1>CREATE PRODUCT</h1>
+  
+   <form id='form1'>
+      {% csrf_token %}
+      <h1></h1>
+      prouduct_name <br/>
+      <input type="text" id="pname"/>
+      <div id="name_error" class="hide"></div>
+      <br>
+      price <br/>
+      <input type="number" id="price"/>
+      <div id="price_error" class="hide"></div>
+      <br>
+      image
+      <input type="file" src="/wp-content/uploads/sendform.png"  id ='img' alt="Submit" width="100">
+      <br>
+      <br>
+      product detail<br/>
+      <input type="text" id="product_detail"/><br>
+      <div id="detail_error" class="hide"></div>
+   </form>
+         <button type="button" id="Save">submit </button>
+</div> 
 
 <div>
     <h1>UPDATE PRODUCT</h1>
@@ -58,13 +83,79 @@
             <input type="number" id="uid" hidden />
         </div>
         <div>
-            <button type="button" id="update">UPDATE</button>
+            <button type="button" id="Update">UPDATE</button>
         </div>
     </form>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
+    //FUNCTION FOR CREATING A PRODUCT
+$(document).ready(function () {  
+                $("#Save").click(function () { 
+       var formData = new FormData();
+       var file = $('#img')[0].files[0] 
+       var token = "{{ csrf_token }}"
+       var name = $('#pname').val();
+       var price = $('#price').val();
+       var product_detail = $('#product_detail').val();
+       // var owner = $('#owner').val();
+       formData.append("image", file, file.name);
+       formData.append("name", name);
+       formData.append("price", price);
+       formData.append("description",product_detail);
+       // formData.append("description",product_detail);   
+       formData.append("csrfmiddlewaretoken", token);
+       url = 'http://localhost:8000/create/'
+       console.log(url)
+       // debugger
+            $.ajax({
+             type: "POST",
+             enctype: 'multipart/form-data',
+             url:url,
+             data: formData,
+             processData: false,
+             contentType: false,
+             cache: false,
+             timeout: 600000,
+             success: function (data) {
+               window.location.reload()
+                 console.log("SUCCESS : ", data);
+   
+             },
+             error: function (data) {
+                debugger;
+                    error_json = data.responseJSON
+                    jQuery.each(error_json,function(key, val){
+                        if (key == 'price'){
+                            debugger;
+                            error_msg = val
+                            $('#price_error').text(error_msg)
+                            // $('#price_error').removeClass("hide")
+                        }
+                        if (key == 'name'){
+                            debugger;
+                            error_msg = val
+                            $('#name_error').text(error_msg)
+                            // $('#price_error').removeClass("hide")
+                        }
+                        if (key == 'description'){
+                            debugger;
+                            error_msg = val
+                            $('#detail_error').text(error_msg)
+                            // $('#price_error').removeClass("hide")
+                        }
+                        else {
+                            error_msg = val
+                            $('#detail_error').text(error_msg)
+                        }
+                    })   
+             }
+         });
+        });
+   });
+
+  
 $.ajax({
     url: 'http://127.0.0.1:8000/products/',
     type: "GET",
@@ -96,11 +187,12 @@ function showDetail(id) {
         dataType: "json",
         success: function(data) {
             $('#ID').text(data.id);
-            $('#IMAGE').text(data.image);
+            // $('#IMAGE').text(data.image);
             $('#NAME').text(data.name);
             $('#PRICE').text(data.price);
             $('#DETAIL').text(data.description);
             $('#SELLER').text(data.owner);
+            $("#IMAGE").html("<img src=\"" + data.image + "\">");
         }
     })
 }
@@ -141,10 +233,10 @@ function update(id) {
         }
     })
 }
-
+    //FUNCTION FOR UPDATING A PRODUCT
         $(document).ready(function () {
-              $("#update").click(function () {
-            
+              $("#Update").click(function () {
+            debugger;
                var formData = new FormData();
                var u_id = $('#uid').val();
                var token = "{{ csrf_token }}"
@@ -153,14 +245,21 @@ function update(id) {
                var product_detail = $('#uproduct_detail').val();
                url = "http://127.0.0.1:8000/update/"+u_id+"/";
                
-               formData.append("name", name);
-               formData.append("price", price);
-               formData.append("description",product_detail);
-               formData.append("csrfmiddlewaretoken", token);
+               // formData.append("name", name);
+               // formData.append("price", price);
+               // formData.append("description",product_detail);
+               // formData.append("csrfmiddlewaretoken", token);
+               data = {
+                        'name' :name,
+                        'price': price,
+                        'description' : product_detail,
+                        'csrfmiddlewaretoken' : '{{ csrf_token }}',
+               }
+               console.log(data);
                     $.ajax({
                      type: "PATCH",
                      url:url,
-                     data: formData,
+                     data: data,
                      success: function (data) {
                        alert('product Updated successfully')
                          console.log("SUCCESS : ", data);
@@ -171,48 +270,11 @@ function update(id) {
                          console.log("ERROR : ", e);
                      }
                  });
+                             // console.log(data);   
                 });
               });
 
 
-// $("#Save").click(function() {
-// var formData = new FormData();
-// // var file = $('#img')[0].files[0] 
-// var token = "{{ csrf_token }}"
-// var name = $('#pname').val();
-// var price = $('#price').val();
-// var product_detail = $('#product_detail').val();
-// // var owner = $('#owner').val();
-// formData.append("image", file, file.name);
-// formData.append("name", name);
-// formData.append("price", price);
-// formData.append("description", product_detail);
-// // formData.append("description",product_detail);   
-// formData.append("csrfmiddlewaretoken", token);
-// url = 'http://localhost:8000/create/'
-// console.log(url)
-// // debugger;
-// $.ajax({
-//     type: "POST",
-//     enctype: 'multipart/form-data',
-//     url: url,
-//     data: formData,
-//     processData: false,
-//     contentType: false,
-//     cache: false,
-//     timeout: 600000,
-//     success: function(data) {
-//         alert('product add successfully')
-//         console.log("SUCCESS : ", data);
-
-//     },
-//     error: function(data) {
-//         alert('something went wrong')
-//         console.log("ERROR : ", e);
-
-//     }
-// });
-// });
 
 
 
